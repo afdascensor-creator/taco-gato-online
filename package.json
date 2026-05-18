@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>Taco Gato Online</title>
+  <style>
+    :root{
+      --ink:#2c251c;--accent:#ff6b35;--accent2:#0f9b8e;--danger:#d62828;--ok:#2a9d8f;
+      --card:#fffaf0;--shadow:0 16px 35px rgba(34,24,12,.18)
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+      background:radial-gradient(circle at 15% 10%,rgba(255,183,3,.25),transparent 28%),
+      radial-gradient(circle at 85% 15%,rgba(15,155,142,.18),transparent 26%),
+      linear-gradient(180deg,#fff7e8,#ffe9c8);
+      -webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none;touch-action:manipulation;overscroll-behavior:none}
+    button,input,select{font:inherit}
+    button{border:0;border-radius:16px;padding:13px 16px;font-weight:900;background:#fff;box-shadow:0 6px 14px rgba(0,0,0,.12);color:var(--ink);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    button:active{transform:translateY(1px)}
+    button:disabled{opacity:.45}
+    input,select{width:100%;border:2px solid #f3caa5;border-radius:14px;padding:12px;background:#fffaf4}
+    .primary{background:var(--accent);color:#fff}.teal{background:var(--accent2);color:#fff}.danger{background:var(--danger);color:#fff}.ghost{background:rgba(255,255,255,.72)}
+    .wrap{max-width:1120px;margin:0 auto;padding:14px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(255,255,255,.62);
+      border:2px solid rgba(255,107,53,.25);border-radius:24px;padding:12px 14px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    h1{font-size:clamp(22px,5vw,40px);margin:0;color:#e85d04}.small{font-size:13px;opacity:.78}
+    .panel{background:rgba(255,255,255,.78);border:2px solid rgba(255,107,53,.22);border-radius:24px;box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    label{font-weight:900;display:block;margin:0 0 6px}.hidden{display:none!important}
+    .room-code{font-size:38px;font-weight:1000;letter-spacing:4px;color:#e85d04;text-align:center;background:#fffaf4;border:2px dashed #f1b36d;border-radius:18px;padding:10px}
+    .status{padding:13px 15px;background:#fffdf7;border-radius:18px;border:2px solid rgba(15,155,142,.25);font-size:18px;font-weight:1000;margin-bottom:12px}
+    .layout{display:grid;grid-template-columns:minmax(260px,1fr) minmax(300px,1.1fr);gap:14px}
+    @media(max-width:820px){.layout{grid-template-columns:1fr}}
+    .players{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+    .player{background:rgba(255,255,255,.82);border:3px solid transparent;border-radius:20px;padding:12px}
+    .player.me{border-color:var(--accent2)}.player.turn{border-color:var(--accent)}.player.off{opacity:.55}.player.flash{border-color:var(--danger);background:#fff0f0}
+    .player h3{display:flex;justify-content:space-between;margin:0 0 8px;font-size:18px}
+    .table{background:rgba(255,255,255,.8);border-radius:26px;box-shadow:var(--shadow);padding:14px}
+    .pile{background:#fffaf4;border:2px dashed #f1b36d;border-radius:22px;min-height:270px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center}
+    .card{width:170px;height:230px;border-radius:24px;background:var(--card);border:5px solid var(--c,#e85d04);box-shadow:0 14px 25px rgba(0,0,0,.16);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 10px 18px;animation:pop .18s ease-out}
+    .card-name{font-weight:1000;letter-spacing:2px;font-size:25px;color:var(--c,#e85d04);text-transform:uppercase}.emoji{font-size:88px}.card-type{font-size:13px;font-weight:900;opacity:.7;text-transform:uppercase}
+    @keyframes pop{from{transform:scale(.88);opacity:.4}to{transform:scale(1);opacity:1}}
+    .actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.big{min-height:62px;font-size:20px}
+    .hand{background:#fff7f7;border:3px solid rgba(214,40,40,.18)}.hand.ready{background:linear-gradient(135deg,#d62828,#ff6b35);color:#fff;animation:pulse .55s infinite alternate}.hand.done{background:var(--ok);color:white}
+    @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.035)}}
+    .special{position:fixed;inset:0;background:rgba(27,20,11,.72);z-index:10;align-items:center;justify-content:center;padding:16px;display:none}
+    .special.show{display:flex}.special-card{max-width:520px;width:100%;background:#fff7e8;border:4px solid #fff;border-radius:28px;box-shadow:0 28px 80px rgba(0,0,0,.45);padding:18px;text-align:center}
+    .special-icon{font-size:70px}.timer{font-weight:900;color:#7b3f00;margin-top:8px;min-height:20px}
+    .log{background:#fffdf8;border-radius:16px;border:1px solid #efd2ad;padding:10px;max-height:150px;overflow:auto;font-size:14px;margin-top:12px}
+    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#fff;padding:7px 10px;border:1px solid #efd2ad;font-weight:900;font-size:13px;margin:3px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>🌮 Taco · Gato · Cabra · Queso · Pizza</h1><div class="small">Online multijugador · iPhone · iPad · Android · ordenador</div></div>
+    <button class="ghost" id="soundBtn">🔊 Sonido ON</button>
+  </header>
+
+  <section class="panel" id="home">
+    <h2>Conectarse</h2>
+    <div class="grid">
+      <div>
+        <label>Tu nombre</label>
+        <input id="name" value="Jugador"/>
+      </div>
+      <div>
+        <label>Jugadores de la partida</label>
+        <select id="maxPlayers">
+          <option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option>
+          <option value="5">5 jugadores</option><option value="6">6 jugadores</option><option value="7">7 jugadores</option><option value="8">8 jugadores</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+      <button class="primary" id="createBtn">Crear sala</button>
+    </div>
+    <hr style="border:0;border-top:1px solid #efd2ad;margin:16px 0">
+    <div class="grid">
+      <div>
+        <label>Código de sala</label>
+        <input id="joinCode" placeholder="Ej. ABC23" maxlength="5"/>
+      </div>
+      <div style="align-self:end">
+        <button class="teal" id="joinBtn">Entrar a sala</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="lobby">
+    <h2>Sala</h2>
+    <div class="room-code" id="roomCode">-----</div>
+    <p class="small" style="text-align:center">Comparte este código con los demás jugadores. Todos deben abrir la misma URL.</p>
+    <div id="lobbyPlayers"></div>
+    <button class="primary big" id="startBtn">Empezar partida</button>
+  </section>
+
+  <section class="hidden" id="game">
+    <div class="status" id="status">Conectando...</div>
+    <div class="layout">
+      <div>
+        <div class="panel">
+          <h2>Jugadores</h2>
+          <div class="players" id="players"></div>
+        </div>
+      </div>
+      <div class="table">
+        <div class="pile">
+          <div id="pileCount" style="font-weight:1000;color:#d9480f">Centro: 0 cartas</div>
+          <div id="lastCard"><span class="small">Centro vacío</span></div>
+          <div id="boxInfo" style="font-weight:900;color:#7b3f00"></div>
+        </div>
+        <div class="actions">
+          <button class="primary big" id="playBtn">Tirar carta</button>
+          <button class="hand big" id="handBtn">✋ MANO</button>
+        </div>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="special" id="special">
+  <div class="special-card">
+    <div class="special-icon" id="specialIcon">🦍</div>
+    <h2 id="specialTitle">Carta especial</h2>
+    <p id="specialText">Pulsa, espera 2 segundos y vuelve a pulsar.</p>
+    <button class="primary big" id="specialBtn">PULSAR</button>
+    <div class="timer" id="specialTimer"></div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+let state = null;
+let myPlayerId = null;
+let roomCode = null;
+let soundEnabled = true;
+let audioCtx = null;
+let activeAnimalSound = null;
+let lastTap = {key:"",time:0};
+const logLines = [];
+
+const $ = id => document.getElementById(id);
+
+$("createBtn").addEventListener("pointerdown", e => safeTap("create", e, createRoom));
+$("joinBtn").addEventListener("pointerdown", e => safeTap("join", e, joinRoom));
+$("startBtn").addEventListener("pointerdown", e => safeTap("start", e, () => socket.emit("startGame")));
+$("playBtn").addEventListener("pointerdown", e => safeTap("play", e, () => socket.emit("playCard")));
+$("handBtn").addEventListener("pointerdown", e => safeTap("hand", e, () => socket.emit("hand")));
+$("specialBtn").addEventListener("pointerdown", e => safeTap("special", e, () => socket.emit("specialClick")));
+$("soundBtn").addEventListener("pointerdown", e => safeTap("sound", e, toggleSound));
+document.addEventListener("touchstart", () => initAudio(), {passive:true});
+document.addEventListener("pointerdown", () => initAudio(), {passive:true});
+
+socket.on("joined", data => { myPlayerId = data.playerId; roomCode = data.code; });
+socket.on("errorMessage", msg => alert(msg));
+socket.on("state", s => {
+  const oldPhase = state?.phase;
+  const oldLast = state?.lastPlayed?.card?.id;
+  state = s;
+  if(s.message) addLog(s.message);
+  if(s.lastPlayed && s.lastPlayed.card && s.lastPlayed.card.id !== oldLast) playCardSound(s.lastPlayed.card);
+  if(s.phase === "slap" && oldPhase !== "slap") playSlapSound();
+  render();
+});
+
+function safeTap(key, event, fn){
+  event && event.preventDefault();
+  event && event.stopPropagation();
+  initAudio();
+  const now = performance.now();
+  if(lastTap.key === key && now-lastTap.time < 350) return;
+  lastTap = {key,time:now};
+  fn();
+}
+
+function createRoom(){
+  socket.emit("createRoom", { name: $("name").value || "Jugador", maxPlayers: Number($("maxPlayers").value) });
+}
+function joinRoom(){
+  socket.emit("joinRoom", { name: $("name").value || "Jugador", code: $("joinCode").value });
+}
+
+function render(){
+  if(!state) return;
+  $("home").classList.add("hidden");
+  $("roomCode").textContent = state.code;
+
+  if(!state.started){
+    $("lobby").classList.remove("hidden");
+    $("game").classList.add("hidden");
+    $("startBtn").disabled = state.hostId !== myPlayerId || state.players.length !== state.maxPlayers;
+    $("lobbyPlayers").innerHTML = state.players.map(p => `<span class="badge">${p.connected ? "🟢":"⚪"} ${esc(p.name)} · ${p.count} cartas</span>`).join("");
+    return;
+  }
+
+  $("lobby").classList.add("hidden");
+  $("game").classList.remove("hidden");
+
+  const me = state.players.find(p => p.id === myPlayerId);
+  const turnName = state.players.find(p => p.id === state.currentPlayerId)?.name || "";
+  $("status").textContent = state.phase === "finished"
+    ? `🏆 Gana ${state.players.find(p => p.id === state.winnerId)?.name || ""}`
+    : state.phase === "normal"
+      ? `Turno de ${turnName}`
+      : state.phase === "slap"
+        ? "¡Coincidencia! Pulsa tu mano"
+        : "Carta especial";
+
+  $("players").innerHTML = state.players.map(p => `
+    <div class="player ${p.id===myPlayerId?"me":""} ${p.id===state.currentPlayerId?"turn":""} ${!p.connected?"off":""}">
+      <h3><span>${esc(p.name)} ${p.id===myPlayerId?"(tú)":""}</span><span>${p.count}</span></h3>
+      <div class="small">${p.connected ? "Conectado" : "Desconectado"}</div>
+    </div>`).join("");
+
+  $("pileCount").textContent = `Centro: ${state.centerCount} carta${state.centerCount===1?"":"s"}`;
+  $("boxInfo").textContent = `Caja: ${state.boxCount} carta${state.boxCount===1?"":"s"} fuera de juego`;
+  $("lastCard").innerHTML = state.lastPlayed ? cardHTML(state.lastPlayed.card, state.lastPlayed.playerName) : `<span class="small">Centro vacío</span>`;
+
+  $("playBtn").disabled = !(state.phase === "normal" && state.currentPlayerId === myPlayerId && me && me.count > 0);
+  const slapEntry = state.slap?.entries?.find(e => e.playerId === myPlayerId);
+  const handDone = Boolean(slapEntry?.pressedAt);
+  $("handBtn").disabled = handDone || state.phase === "finished";
+  $("handBtn").textContent = state.phase === "slap"
+    ? (handDone ? "✅ MANO PUESTA" : "✋ PONER MANO")
+    : "✋ MANO";
+  $("handBtn").className = "hand big" + (state.phase === "slap" && !handDone ? " ready" : "") + (handDone ? " done" : "");
+
+  renderSpecial();
+  $("log").innerHTML = logLines.slice(-12).map(x => `<div>${esc(x)}</div>`).join("");
+}
+
+function renderSpecial(){
+  if(state.phase !== "reaction" || !state.reaction){
+    $("special").classList.remove("show");
+    stopAnimalSound();
+    return;
+  }
+  const entry = state.reaction.entries.find(e => e.playerId === myPlayerId);
+  const card = state.reaction.card;
+  $("special").classList.add("show");
+  $("specialIcon").textContent = card.emoji;
+  $("specialTitle").textContent = `Especial: ${card.name}`;
+  if(entry.stage === 0){
+    $("specialBtn").disabled = false;
+    $("specialBtn").textContent = `${card.emoji} PULSAR`;
+    $("specialTimer").textContent = "Primera pulsación";
+  }else if(entry.stage === 1){
+    const left = Math.max(0, entry.readyAt - Date.now());
+    if(left > 0){
+      $("specialBtn").disabled = true;
+      $("specialTimer").textContent = `Espera ${(left/1000).toFixed(1)} s`;
+      startAnimalSound(card.name, Math.min(left, 2000));
+      setTimeout(renderSpecial, 100);
+    }else{
+      $("specialBtn").disabled = false;
+      $("specialBtn").textContent = `${card.emoji} OTRA VEZ`;
+      $("specialTimer").textContent = "Pulsa otra vez";
+    }
+  }else{
+    $("specialBtn").disabled = true;
+    $("specialBtn").textContent = "✅ COMPLETADO";
+    $("specialTimer").textContent = "Esperando al resto";
+  }
+}
+
+function cardHTML(card, playerName){
+  return `<div class="card" style="--c:${card.color}">
+    <div class="card-name">${esc(card.name)}</div>
+    <div class="emoji">${card.emoji}</div>
+    <div class="card-type">${card.type}</div>
+  </div><div class="small">Tirada por ${esc(playerName||"")}</div>`;
+}
+function addLog(text){ if(!text) return; if(logLines[logLines.length-1] !== text) logLines.push(text); }
+
+function esc(str){return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s]));}
+
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  $("soundBtn").textContent = soundEnabled ? "🔊 Sonido ON" : "🔇 Sonido OFF";
+  if(!soundEnabled){ stopAnimalSound(); speechSynthesis?.cancel?.(); }
+  else initAudio();
+}
+function initAudio(){
+  if(!soundEnabled) return;
+  try{
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(Ctx && !audioCtx) audioCtx = new Ctx();
+    if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+  }catch(e){}
+}
+function playCardSound(card){
+  if(!soundEnabled) return;
+  initAudio();
+  if(card.type === "normal") speakName(card.name);
+  else startAnimalSound(card.name, 900);
+}
+function speakName(name){
+  if(!("speechSynthesis" in window)) return playBeep(500);
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(name);
+    u.lang = "es-ES"; u.rate = 1.02; u.pitch = 1.05;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith("es"));
+    if(v) u.voice = v;
+    speechSynthesis.speak(u);
+  }catch(e){ playBeep(500); }
+}
+function playBeep(freq){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = "triangle"; o.frequency.setValueAtTime(freq, now);
+  g.gain.setValueAtTime(.001, now); g.gain.exponentialRampToValueAtTime(.22, now+.02); g.gain.exponentialRampToValueAtTime(.001, now+.18);
+  o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now+.2);
+}
+function playSlapSound(){ playBeep(180); }
+function startAnimalSound(name, durationMs=2000){
+  if(!soundEnabled) return;
+  initAudio(); if(!audioCtx) return; stopAnimalSound();
+  const end = audioCtx.currentTime + durationMs/1000, master = audioCtx.createGain();
+  master.gain.setValueAtTime(.001,audioCtx.currentTime); master.gain.exponentialRampToValueAtTime(.28,audioCtx.currentTime+.03); master.gain.exponentialRampToValueAtTime(.001,end); master.connect(audioCtx.destination);
+  const nodes=[master];
+  const o = audioCtx.createOscillator(); o.type = name==="Gorila" ? "sawtooth" : name==="Marmota" ? "sine" : "triangle";
+  o.frequency.setValueAtTime(name==="Gorila"?72:name==="Marmota"?720:390, audioCtx.currentTime);
+  o.frequency.linearRampToValueAtTime(name==="Gorila"?48:name==="Marmota"?980:180, end);
+  o.connect(master); o.start(); o.stop(end); nodes.push(o);
+  activeAnimalSound = {nodes}; setTimeout(stopAnimalSound, durationMs+60);
+}
+function stopAnimalSound(){
+  if(!activeAnimalSound) return;
+  activeAnimalSound.nodes.forEach(n => { try{n.stop?.()}catch(e){} try{n.disconnect?.()}catch(e){} });
+  activeAnimalSound = null;
+}
+if("speechSynthesis" in window && speechSynthesis.onvoiceschanged !== undefined){
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+</script>
+</body>
+</html>

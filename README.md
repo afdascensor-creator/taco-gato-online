@@ -1,0 +1,16 @@
+{
+  "name": "taco-gato-cabra-online",
+  "version": "1.0.0",
+  "description": "Juego online multijugador en tiempo real para iPhone, iPad y navegador.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3",
+    "socket.io": "^4.7.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
