@@ -13,20 +13,19 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-
 app.use(express.static("public"));
 
 const rooms = new Map();
 
 const DEFINITIONS = {
-  Taco: { emoji: "🌮", color: "#e85d04", type: "normal", count: 11 },
-  Gato: { emoji: "🐱", color: "#0f9b8e", type: "normal", count: 11 },
-  Cabra: { emoji: "🐐", color: "#4c9a2a", type: "normal", count: 11 },
-  Queso: { emoji: "🧀", color: "#f2a900", type: "normal", count: 11 },
-  Pizza: { emoji: "🍕", color: "#d62828", type: "normal", count: 11 },
-  Gorila: { emoji: "🦍", color: "#1d4e89", type: "especial", count: 3 },
-  Marmota: { emoji: "🦫", color: "#7b3f00", type: "especial", count: 3 },
-  Narval: { emoji: "🦄", color: "#7b2cbf", type: "especial", count: 3 }
+  Taco: { emoji: "🌮", color: "#e85d04", type: "normal", count: 11, key: "card_taco" },
+  Gato: { emoji: "🐱", color: "#0f9b8e", type: "normal", count: 11, key: "card_gato" },
+  Cabra: { emoji: "🐐", color: "#4c9a2a", type: "normal", count: 11, key: "card_cabra" },
+  Queso: { emoji: "🧀", color: "#f2a900", type: "normal", count: 11, key: "card_queso" },
+  Pizza: { emoji: "🍕", color: "#d62828", type: "normal", count: 11, key: "card_pizza" },
+  Gorila: { emoji: "🦍", color: "#1d4e89", type: "especial", count: 3, key: "card_gorila" },
+  Marmota: { emoji: "🦫", color: "#7b3f00", type: "especial", count: 3, key: "card_marmota" },
+  Narval: { emoji: "🦄", color: "#7b2cbf", type: "especial", count: 3, key: "card_narval" }
 };
 
 function dealCountForPlayers(n) {
@@ -39,44 +38,41 @@ function dealCountForPlayers(n) {
 function makeRoomCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
-
   do {
     code = "";
-    for (let i = 0; i < 5; i++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
+    for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
   } while (rooms.has(code));
-
   return code;
 }
 
 function buildDeck() {
   const deck = [];
-
   for (const [name, def] of Object.entries(DEFINITIONS)) {
     for (let i = 0; i < def.count; i++) {
       deck.push({
         id: crypto.randomUUID(),
         name,
+        nameKey: def.key,
         emoji: def.emoji,
         color: def.color,
         type: def.type
       });
     }
   }
-
   return shuffle(deck);
 }
 
 function shuffle(arr) {
   const a = [...arr];
-
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
-
   return a;
+}
+
+function msg(key, params = {}) {
+  return { key, params };
 }
 
 function getSocketRoom(socket) {
@@ -96,7 +92,6 @@ function playerPublic(player) {
 
 function roomPublic(room, forPlayerId) {
   const me = room.players.find((p) => p.id === forPlayerId);
-
   return {
     code: room.code,
     hostId: room.hostId,
@@ -107,62 +102,50 @@ function roomPublic(room, forPlayerId) {
     me: me ? playerPublic(me) : null,
     currentPlayerId: room.currentPlayerId,
     centerCount: room.center.length,
-    lastPlayed: room.lastPlayed
-      ? {
-          card: room.lastPlayed.card,
-          playerId: room.lastPlayed.playerId,
-          playerName:
-            room.players.find((p) => p.id === room.lastPlayed.playerId)?.name ||
-            ""
-        }
-      : null,
+    lastPlayed: room.lastPlayed ? {
+      card: room.lastPlayed.card,
+      playerId: room.lastPlayed.playerId,
+      playerName: room.players.find((p) => p.id === room.lastPlayed.playerId)?.name || ""
+    } : null,
     boxCount: room.box.length,
     message: room.message,
-    slap: room.slap
-      ? {
-          card: room.slap.card,
-          entries: room.slap.entries.map((e) => ({
-            playerId: e.playerId,
-            pressedAt: Boolean(e.pressedAt)
-          }))
-        }
-      : null,
-    reaction: room.reaction
-      ? {
-          card: room.reaction.card,
-          entries: room.reaction.entries.map((e) => ({
-            playerId: e.playerId,
-            stage: e.stage,
-            readyAt: e.readyAt
-          }))
-        }
-      : null,
+    slap: room.slap ? {
+      card: room.slap.card,
+      entries: room.slap.entries.map((e) => ({
+        playerId: e.playerId,
+        pressedAt: Boolean(e.pressedAt)
+      }))
+    } : null,
+    reaction: room.reaction ? {
+      card: room.reaction.card,
+      entries: room.reaction.entries.map((e) => ({
+        playerId: e.playerId,
+        stage: e.stage,
+        readyAt: e.readyAt
+      }))
+    } : null,
     winnerId: room.winnerId
   };
 }
 
 function broadcast(room) {
   for (const player of room.players) {
-    if (player.socketId) {
-      io.to(player.socketId).emit("state", roomPublic(room, player.id));
-    }
+    if (player.socketId) io.to(player.socketId).emit("state", roomPublic(room, player.id));
   }
 }
 
-function sendError(socket, message) {
-  socket.emit("errorMessage", message);
+function sendError(socket, key, params = {}) {
+  socket.emit("errorMessage", msg(key, params));
 }
 
 function createRoom(socket, data) {
   const maxPlayers = Number(data.maxPlayers);
-
   if (!Number.isInteger(maxPlayers) || maxPlayers < 2 || maxPlayers > 8) {
-    sendError(socket, "Número de jugadores inválido.");
+    sendError(socket, "err_invalid_players");
     return;
   }
 
   const code = makeRoomCode();
-
   const player = {
     id: crypto.randomUUID(),
     socketId: socket.id,
@@ -182,18 +165,16 @@ function createRoom(socket, data) {
     currentPlayerId: null,
     phase: "lobby",
     lastPlayed: null,
-    message: "Sala creada. Comparte el código con los demás jugadores.",
+    message: msg("room_created"),
     slap: null,
     reaction: null,
     winnerId: null
   };
 
   rooms.set(code, room);
-
   socket.join(code);
   socket.data.roomCode = code;
   socket.data.playerId = player.id;
-
   socket.emit("joined", { code, playerId: player.id });
   broadcast(room);
 }
@@ -202,20 +183,9 @@ function joinRoom(socket, data) {
   const code = String(data.code || "").trim().toUpperCase();
   const room = rooms.get(code);
 
-  if (!room) {
-    sendError(socket, "No existe una sala con ese código.");
-    return;
-  }
-
-  if (room.started) {
-    sendError(socket, "La partida ya ha empezado.");
-    return;
-  }
-
-  if (room.players.length >= room.maxPlayers) {
-    sendError(socket, "La sala ya está completa.");
-    return;
-  }
+  if (!room) return sendError(socket, "err_room_not_found");
+  if (room.started) return sendError(socket, "err_game_started");
+  if (room.players.length >= room.maxPlayers) return sendError(socket, "err_room_full");
 
   const player = {
     id: crypto.randomUUID(),
@@ -226,14 +196,12 @@ function joinRoom(socket, data) {
   };
 
   room.players.push(player);
-
   socket.join(code);
   socket.data.roomCode = code;
   socket.data.playerId = player.id;
-
   socket.emit("joined", { code, playerId: player.id });
 
-  room.message = `${player.name} se ha unido a la sala.`;
+  room.message = msg("player_joined", { player: player.name });
   broadcast(room);
 }
 
@@ -241,22 +209,14 @@ function startGame(socket) {
   const room = getSocketRoom(socket);
   if (!room) return;
 
-  if (socket.data.playerId !== room.hostId) {
-    sendError(socket, "Solo el anfitrión puede empezar la partida.");
-    return;
-  }
-
-  if (room.players.length !== room.maxPlayers) {
-    sendError(socket, `Faltan jugadores. Deben entrar ${room.maxPlayers}.`);
-    return;
-  }
+  if (socket.data.playerId !== room.hostId) return sendError(socket, "err_only_host");
+  if (room.players.length !== room.maxPlayers) return sendError(socket, "err_missing_players", { count: room.maxPlayers });
 
   const deal = dealCountForPlayers(room.maxPlayers);
   const deck = buildDeck();
   const used = deck.slice(0, room.maxPlayers * deal);
 
   room.box = deck.slice(room.maxPlayers * deal);
-
   room.players.forEach((player, index) => {
     player.deck = used.slice(index * deal, (index + 1) * deal);
   });
@@ -269,7 +229,7 @@ function startGame(socket) {
   room.slap = null;
   room.reaction = null;
   room.winnerId = null;
-  room.message = `Partida iniciada. ${deal} cartas por jugador. ${room.box.length} a la caja.`;
+  room.message = msg("game_started", { deal, box: room.box.length });
 
   broadcast(room);
 }
@@ -277,11 +237,9 @@ function startGame(socket) {
 function nextTurn(room, fromPlayerId) {
   let index = room.players.findIndex((p) => p.id === fromPlayerId);
   if (index < 0) index = 0;
-
   for (let i = 0; i < room.players.length; i++) {
     index = (index + 1) % room.players.length;
     const candidate = room.players[index];
-
     if (candidate.deck.length > 0) {
       room.currentPlayerId = candidate.id;
       return;
@@ -294,21 +252,17 @@ function playCard(socket) {
   if (!room || room.phase !== "normal") return;
 
   const playerId = socket.data.playerId;
-
   if (room.currentPlayerId !== playerId) return;
 
   const player = room.players.find((p) => p.id === playerId);
   if (!player || player.deck.length === 0) return;
 
-  const previous = room.center.length
-    ? room.center[room.center.length - 1]
-    : null;
-
+  const previous = room.center.length ? room.center[room.center.length - 1] : null;
   const card = player.deck.shift();
 
   room.center.push({ card, playerId });
   room.lastPlayed = { card, playerId };
-  room.message = `${player.name} tira ${card.emoji} ${card.name}.`;
+  room.message = msg("player_played", { player: player.name, cardKey: card.nameKey, emoji: card.emoji });
 
   if (card.type === "especial") {
     room.phase = "reaction";
@@ -322,8 +276,7 @@ function playCard(socket) {
         completedAt: null
       }))
     };
-
-    room.message = `Especial: ${card.name}. Pulsa, espera 2 segundos y vuelve a pulsar.`;
+    room.message = msg("special_started", { cardKey: card.nameKey, emoji: card.emoji });
     broadcast(room);
     return;
   }
@@ -332,13 +285,9 @@ function playCard(socket) {
     room.phase = "slap";
     room.slap = {
       card,
-      entries: room.players.map((p) => ({
-        playerId: p.id,
-        pressedAt: null
-      }))
+      entries: room.players.map((p) => ({ playerId: p.id, pressedAt: null }))
     };
-
-    room.message = `Coincidencia de ${card.name}. Todos deben pulsar su mano.`;
+    room.message = msg("match_started", { cardKey: card.nameKey, emoji: card.emoji });
     broadcast(room);
     return;
   }
@@ -346,7 +295,7 @@ function playCard(socket) {
   if (player.deck.length === 0) {
     room.phase = "finished";
     room.winnerId = player.id;
-    room.message = `${player.name} gana la partida.`;
+    room.message = msg("winner", { player: player.name });
     broadcast(room);
     return;
   }
@@ -355,12 +304,11 @@ function playCard(socket) {
   broadcast(room);
 }
 
-function takeCenter(room, playerId, reason) {
+function takeCenter(room, playerId, reasonKey, params = {}) {
   const player = room.players.find((p) => p.id === playerId);
   if (!player) return;
 
   const cards = room.center.map((x) => x.card);
-
   player.deck.push(...cards);
 
   room.center = [];
@@ -369,9 +317,12 @@ function takeCenter(room, playerId, reason) {
   room.slap = null;
   room.reaction = null;
   room.currentPlayerId = playerId;
-  room.message = `${player.name} se queda ${cards.length} carta${
-    cards.length === 1 ? "" : "s"
-  } del centro. ${reason}`;
+  room.message = msg("take_center", {
+    player: player.name,
+    count: cards.length,
+    reasonKey,
+    ...params
+  });
 }
 
 function hand(socket) {
@@ -381,11 +332,7 @@ function hand(socket) {
   const playerId = socket.data.playerId;
 
   if (room.phase !== "slap") {
-    takeCenter(
-      room,
-      playerId,
-      "Penalización: tocó la mano cuando no había coincidencia."
-    );
+    takeCenter(room, playerId, "reason_penalty_no_match");
     broadcast(room);
     return;
   }
@@ -396,17 +343,10 @@ function hand(socket) {
   entry.pressedAt = Date.now();
 
   if (room.slap.entries.every((e) => e.pressedAt)) {
-    const loser = room.slap.entries.reduce((late, e) =>
-      e.pressedAt > late.pressedAt ? e : late
-    );
-
-    takeCenter(
-      room,
-      loser.playerId,
-      `Último en poner la mano en coincidencia de ${room.slap.card.name}.`
-    );
+    const loser = room.slap.entries.reduce((late, e) => e.pressedAt > late.pressedAt ? e : late);
+    takeCenter(room, loser.playerId, "reason_last_hand", { cardKey: room.slap.card.nameKey });
   } else {
-    room.message = "Mano recibida. Faltan jugadores.";
+    room.message = msg("hand_received");
   }
 
   broadcast(room);
@@ -418,7 +358,6 @@ function specialClick(socket) {
 
   const playerId = socket.data.playerId;
   const entry = room.reaction.entries.find((e) => e.playerId === playerId);
-
   if (!entry || entry.stage === 2) return;
 
   const now = Date.now();
@@ -427,32 +366,22 @@ function specialClick(socket) {
     entry.stage = 1;
     entry.firstAt = now;
     entry.readyAt = now + 2000;
-    room.message = "Primera pulsación especial recibida. Espera 2 segundos.";
+    room.message = msg("special_first_click");
     broadcast(room);
     return;
   }
 
   if (entry.stage === 1) {
-    if (now < entry.readyAt) {
-      sendError(socket, "Debes esperar los 2 segundos completos.");
-      return;
-    }
+    if (now < entry.readyAt) return sendError(socket, "err_wait_two_seconds");
 
     entry.stage = 2;
     entry.completedAt = now;
 
     if (room.reaction.entries.every((e) => e.stage === 2)) {
-      const loser = room.reaction.entries.reduce((late, e) =>
-        e.completedAt > late.completedAt ? e : late
-      );
-
-      takeCenter(
-        room,
-        loser.playerId,
-        `Último en completar la carta especial ${room.reaction.card.name}.`
-      );
+      const loser = room.reaction.entries.reduce((late, e) => e.completedAt > late.completedAt ? e : late);
+      takeCenter(room, loser.playerId, "reason_last_special", { cardKey: room.reaction.card.nameKey });
     } else {
-      room.message = "Especial completado. Faltan jugadores.";
+      room.message = msg("special_completed_waiting");
     }
 
     broadcast(room);
@@ -464,20 +393,17 @@ function disconnect(socket) {
   if (!room) return;
 
   const player = room.players.find((p) => p.id === socket.data.playerId);
-
   if (player) {
     player.connected = false;
     player.socketId = null;
-    room.message = `${player.name} se ha desconectado.`;
+    room.message = msg("player_disconnected", { player: player.name });
     broadcast(room);
   }
 
   if (!room.players.some((p) => p.connected)) {
     setTimeout(() => {
       const currentRoom = rooms.get(room.code);
-      if (currentRoom && !currentRoom.players.some((p) => p.connected)) {
-        rooms.delete(room.code);
-      }
+      if (currentRoom && !currentRoom.players.some((p) => p.connected)) rooms.delete(room.code);
     }, 60000);
   }
 }

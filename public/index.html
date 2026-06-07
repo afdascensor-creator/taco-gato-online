@@ -6,338 +6,64 @@
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <title>Taco Gato Online</title>
   <style>
-    :root{
-      --ink:#2c251c;--accent:#ff6b35;--accent2:#0f9b8e;--danger:#d62828;--ok:#2a9d8f;
-      --card:#fffaf0;--shadow:0 16px 35px rgba(34,24,12,.18)
-    }
+    :root{--ink:#2c251c;--accent:#ff6b35;--accent2:#0f9b8e;--danger:#d62828;--ok:#2a9d8f;--card:#fffaf0;--shadow:0 16px 35px rgba(34,24,12,.18)}
     *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
-      background:radial-gradient(circle at 15% 10%,rgba(255,183,3,.25),transparent 28%),
-      radial-gradient(circle at 85% 15%,rgba(15,155,142,.18),transparent 26%),
-      linear-gradient(180deg,#fff7e8,#ffe9c8);
-      -webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none;touch-action:manipulation;overscroll-behavior:none}
-    button,input,select{font:inherit}
-    button{border:0;border-radius:16px;padding:13px 16px;font-weight:900;background:#fff;box-shadow:0 6px 14px rgba(0,0,0,.12);color:var(--ink);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-    button:active{transform:translateY(1px)}
-    button:disabled{opacity:.45}
+    html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 10%,rgba(255,183,3,.25),transparent 28%),radial-gradient(circle at 85% 15%,rgba(15,155,142,.18),transparent 26%),linear-gradient(180deg,#fff7e8,#ffe9c8);-webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none;touch-action:manipulation;overscroll-behavior:none}
+    button,input,select{font:inherit} button{border:0;border-radius:16px;padding:13px 16px;font-weight:900;background:#fff;box-shadow:0 6px 14px rgba(0,0,0,.12);color:var(--ink);touch-action:manipulation;-webkit-tap-highlight-color:transparent} button:active{transform:translateY(1px)} button:disabled{opacity:.45}
     input,select{width:100%;border:2px solid #f3caa5;border-radius:14px;padding:12px;background:#fffaf4}
-    .primary{background:var(--accent);color:#fff}.teal{background:var(--accent2);color:#fff}.danger{background:var(--danger);color:#fff}.ghost{background:rgba(255,255,255,.72)}
-    .wrap{max-width:1120px;margin:0 auto;padding:14px}
-    header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(255,255,255,.62);
-      border:2px solid rgba(255,107,53,.25);border-radius:24px;padding:12px 14px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
-    h1{font-size:clamp(22px,5vw,40px);margin:0;color:#e85d04}.small{font-size:13px;opacity:.78}
-    .panel{background:rgba(255,255,255,.78);border:2px solid rgba(255,107,53,.22);border-radius:24px;box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-    label{font-weight:900;display:block;margin:0 0 6px}.hidden{display:none!important}
-    .room-code{font-size:38px;font-weight:1000;letter-spacing:4px;color:#e85d04;text-align:center;background:#fffaf4;border:2px dashed #f1b36d;border-radius:18px;padding:10px}
-    .status{padding:13px 15px;background:#fffdf7;border-radius:18px;border:2px solid rgba(15,155,142,.25);font-size:18px;font-weight:1000;margin-bottom:12px}
-    .layout{display:grid;grid-template-columns:minmax(260px,1fr) minmax(300px,1.1fr);gap:14px}
-    @media(max-width:820px){.layout{grid-template-columns:1fr}}
-    .players{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
-    .player{background:rgba(255,255,255,.82);border:3px solid transparent;border-radius:20px;padding:12px}
-    .player.me{border-color:var(--accent2)}.player.turn{border-color:var(--accent)}.player.off{opacity:.55}.player.flash{border-color:var(--danger);background:#fff0f0}
-    .player h3{display:flex;justify-content:space-between;margin:0 0 8px;font-size:18px}
-    .table{background:rgba(255,255,255,.8);border-radius:26px;box-shadow:var(--shadow);padding:14px}
-    .pile{background:#fffaf4;border:2px dashed #f1b36d;border-radius:22px;min-height:270px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center}
-    .card{width:170px;height:230px;border-radius:24px;background:var(--card);border:5px solid var(--c,#e85d04);box-shadow:0 14px 25px rgba(0,0,0,.16);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 10px 18px;animation:pop .18s ease-out}
-    .card-name{font-weight:1000;letter-spacing:2px;font-size:25px;color:var(--c,#e85d04);text-transform:uppercase}.emoji{font-size:88px}.card-type{font-size:13px;font-weight:900;opacity:.7;text-transform:uppercase}
-    @keyframes pop{from{transform:scale(.88);opacity:.4}to{transform:scale(1);opacity:1}}
-    .actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.big{min-height:62px;font-size:20px}
-    .hand{background:#fff7f7;border:3px solid rgba(214,40,40,.18)}.hand.ready{background:linear-gradient(135deg,#d62828,#ff6b35);color:#fff;animation:pulse .55s infinite alternate}.hand.done{background:var(--ok);color:white}
-    @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.035)}}
-    .special{position:fixed;inset:0;background:rgba(27,20,11,.72);z-index:10;align-items:center;justify-content:center;padding:16px;display:none}
-    .special.show{display:flex}.special-card{max-width:520px;width:100%;background:#fff7e8;border:4px solid #fff;border-radius:28px;box-shadow:0 28px 80px rgba(0,0,0,.45);padding:18px;text-align:center}
-    .special-icon{font-size:70px}.timer{font-weight:900;color:#7b3f00;margin-top:8px;min-height:20px}
-    .log{background:#fffdf8;border-radius:16px;border:1px solid #efd2ad;padding:10px;max-height:150px;overflow:auto;font-size:14px;margin-top:12px}
-    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#fff;padding:7px 10px;border:1px solid #efd2ad;font-weight:900;font-size:13px;margin:3px}
+    .primary{background:var(--accent);color:#fff}.teal{background:var(--accent2);color:#fff}.ghost{background:rgba(255,255,255,.72)}
+    .wrap{max-width:1120px;margin:0 auto;padding:14px} header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(255,255,255,.62);border:2px solid rgba(255,107,53,.25);border-radius:24px;padding:12px 14px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.08)} h1{font-size:clamp(22px,5vw,40px);margin:0;color:#e85d04}.small{font-size:13px;opacity:.78}
+    .langbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap} .langbar select{width:auto;min-width:160px}
+    .panel{background:rgba(255,255,255,.78);border:2px solid rgba(255,107,53,.22);border-radius:24px;box-shadow:var(--shadow);padding:16px;margin-bottom:12px} .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px} label{font-weight:900;display:block;margin:0 0 6px}.hidden{display:none!important}
+    .room-code{font-size:38px;font-weight:1000;letter-spacing:4px;color:#e85d04;text-align:center;background:#fffaf4;border:2px dashed #f1b36d;border-radius:18px;padding:10px} .status{padding:13px 15px;background:#fffdf7;border-radius:18px;border:2px solid rgba(15,155,142,.25);font-size:18px;font-weight:1000;margin-bottom:12px}
+    .layout{display:grid;grid-template-columns:minmax(260px,1fr) minmax(300px,1.1fr);gap:14px} @media(max-width:820px){.layout{grid-template-columns:1fr}} .players{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px} .player{background:rgba(255,255,255,.82);border:3px solid transparent;border-radius:20px;padding:12px} .player.me{border-color:var(--accent2)}.player.turn{border-color:var(--accent)}.player.off{opacity:.55} .player h3{display:flex;justify-content:space-between;margin:0 0 8px;font-size:18px}
+    .table{background:rgba(255,255,255,.8);border-radius:26px;box-shadow:var(--shadow);padding:14px} .pile{background:#fffaf4;border:2px dashed #f1b36d;border-radius:22px;min-height:270px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center} .card{width:170px;height:230px;border-radius:24px;background:var(--card);border:5px solid var(--c,#e85d04);box-shadow:0 14px 25px rgba(0,0,0,.16);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 10px 18px;animation:pop .18s ease-out} .card-name{font-weight:1000;letter-spacing:2px;font-size:25px;color:var(--c,#e85d04);text-transform:uppercase}.emoji{font-size:88px}.card-type{font-size:13px;font-weight:900;opacity:.7;text-transform:uppercase} @keyframes pop{from{transform:scale(.88);opacity:.4}to{transform:scale(1);opacity:1}}
+    .actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.big{min-height:62px;font-size:20px} .hand{background:#fff7f7;border:3px solid rgba(214,40,40,.18)}.hand.ready{background:linear-gradient(135deg,#d62828,#ff6b35);color:#fff;animation:pulse .55s infinite alternate}.hand.done{background:var(--ok);color:white} @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.035)}}
+    .special{position:fixed;inset:0;background:rgba(27,20,11,.72);z-index:10;align-items:center;justify-content:center;padding:16px;display:none}.special.show{display:flex}.special-card{max-width:520px;width:100%;background:#fff7e8;border:4px solid #fff;border-radius:28px;box-shadow:0 28px 80px rgba(0,0,0,.45);padding:18px;text-align:center}.special-icon{font-size:70px}.timer{font-weight:900;color:#7b3f00;margin-top:8px;min-height:20px} .log{background:#fffdf8;border-radius:16px;border:1px solid #efd2ad;padding:10px;max-height:150px;overflow:auto;font-size:14px;margin-top:12px} .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#fff;padding:7px 10px;border:1px solid #efd2ad;font-weight:900;font-size:13px;margin:3px}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div><h1>🌮 Taco · Gato · Cabra · Queso · Pizza</h1><div class="small">Online multijugador · iPhone · iPad · Android · ordenador</div></div>
-    <button class="ghost" id="soundBtn">🔊 Sonido ON</button>
-  </header>
-
-  <section class="panel" id="home">
-    <h2>Conectarse</h2>
-    <div class="grid">
-      <div>
-        <label>Tu nombre</label>
-        <input id="name" value="Jugador"/>
-      </div>
-      <div>
-        <label>Jugadores de la partida</label>
-        <select id="maxPlayers">
-          <option value="2">2 jugadores</option><option value="3">3 jugadores</option><option value="4">4 jugadores</option>
-          <option value="5">5 jugadores</option><option value="6">6 jugadores</option><option value="7">7 jugadores</option><option value="8">8 jugadores</option>
-        </select>
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-      <button class="primary" id="createBtn">Crear sala</button>
-    </div>
-    <hr style="border:0;border-top:1px solid #efd2ad;margin:16px 0">
-    <div class="grid">
-      <div>
-        <label>Código de sala</label>
-        <input id="joinCode" placeholder="Ej. ABC23" maxlength="5"/>
-      </div>
-      <div style="align-self:end">
-        <button class="teal" id="joinBtn">Entrar a sala</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="panel hidden" id="lobby">
-    <h2>Sala</h2>
-    <div class="room-code" id="roomCode">-----</div>
-    <p class="small" style="text-align:center">Comparte este código con los demás jugadores. Todos deben abrir la misma URL.</p>
-    <div id="lobbyPlayers"></div>
-    <button class="primary big" id="startBtn">Empezar partida</button>
-  </section>
-
-  <section class="hidden" id="game">
-    <div class="status" id="status">Conectando...</div>
-    <div class="layout">
-      <div>
-        <div class="panel">
-          <h2>Jugadores</h2>
-          <div class="players" id="players"></div>
-        </div>
-      </div>
-      <div class="table">
-        <div class="pile">
-          <div id="pileCount" style="font-weight:1000;color:#d9480f">Centro: 0 cartas</div>
-          <div id="lastCard"><span class="small">Centro vacío</span></div>
-          <div id="boxInfo" style="font-weight:900;color:#7b3f00"></div>
-        </div>
-        <div class="actions">
-          <button class="primary big" id="playBtn">Tirar carta</button>
-          <button class="hand big" id="handBtn">✋ MANO</button>
-        </div>
-        <div class="log" id="log"></div>
-      </div>
-    </div>
-  </section>
+<header><div><h1 id="title"></h1><div class="small" id="subtitle"></div></div><div class="langbar"><select id="languageSelect"><option value="es">Español</option><option value="en">English</option><option value="fr">Français</option><option value="ru">Русский</option><option value="uk">Українська</option><option value="de">Deutsch</option><option value="hi">हिन्दी</option><option value="zh">中文</option></select><button class="ghost" id="soundBtn"></button></div></header>
+<section class="panel" id="home"><h2 data-i18n="connect"></h2><div class="grid"><div><label data-i18n="your_name"></label><input id="name" value="Jugador"/></div><div><label data-i18n="players_game"></label><select id="maxPlayers"><option value="2" data-i18n="players_2"></option><option value="3" data-i18n="players_3"></option><option value="4" data-i18n="players_4"></option><option value="5" data-i18n="players_5"></option><option value="6" data-i18n="players_6"></option><option value="7" data-i18n="players_7"></option><option value="8" data-i18n="players_8"></option></select></div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="primary" id="createBtn" data-i18n="create_room"></button></div><hr style="border:0;border-top:1px solid #efd2ad;margin:16px 0"><div class="grid"><div><label data-i18n="room_code"></label><input id="joinCode" placeholder="ABC23" maxlength="5"/></div><div style="align-self:end"><button class="teal" id="joinBtn" data-i18n="join_room"></button></div></div></section>
+<section class="panel hidden" id="lobby"><h2 data-i18n="room"></h2><div class="room-code" id="roomCode">-----</div><p class="small" style="text-align:center" data-i18n="share_code"></p><div id="lobbyPlayers"></div><button class="primary big" id="startBtn" data-i18n="start_game"></button></section>
+<section class="hidden" id="game"><div class="status" id="status"></div><div class="layout"><div><div class="panel"><h2 data-i18n="players"></h2><div class="players" id="players"></div></div></div><div class="table"><div class="pile"><div id="pileCount" style="font-weight:1000;color:#d9480f"></div><div id="lastCard"></div><div id="boxInfo" style="font-weight:900;color:#7b3f00"></div></div><div class="actions"><button class="primary big" id="playBtn" data-i18n="play_card"></button><button class="hand big" id="handBtn"></button></div><div class="log" id="log"></div></div></div></section>
 </div>
-
-<div class="special" id="special">
-  <div class="special-card">
-    <div class="special-icon" id="specialIcon">🦍</div>
-    <h2 id="specialTitle">Carta especial</h2>
-    <p id="specialText">Pulsa, espera 2 segundos y vuelve a pulsar.</p>
-    <button class="primary big" id="specialBtn">PULSAR</button>
-    <div class="timer" id="specialTimer"></div>
-  </div>
-</div>
-
+<div class="special" id="special"><div class="special-card"><div class="special-icon" id="specialIcon">🦍</div><h2 id="specialTitle"></h2><p id="specialText" data-i18n="special_text"></p><button class="primary big" id="specialBtn"></button><div class="timer" id="specialTimer"></div></div></div>
 <script src="/socket.io/socket.io.js"></script>
 <script>
+const I18N = {"es": {"title": "🌮 Taco · Gato · Cabra · Queso · Pizza", "subtitle": "Online multijugador · iPhone · iPad · Android · ordenador", "sound_on": "🔊 Sonido ON", "sound_off": "🔇 Sonido OFF", "connect": "Conectarse", "your_name": "Tu nombre", "players_game": "Jugadores de la partida", "create_room": "Crear sala", "room_code": "Código de sala", "join_room": "Entrar a sala", "room": "Sala", "share_code": "Comparte este código con los demás jugadores. Todos deben abrir la misma URL.", "start_game": "Empezar partida", "players": "Jugadores", "play_card": "Tirar carta", "hand": "✋ MANO", "put_hand": "✋ PONER MANO", "hand_done": "✅ MANO PUESTA", "empty_center": "Centro vacío", "center_count": "Centro: {count} carta{plural}", "box_count": "Caja: {count} carta{plural} fuera de juego", "connected": "Conectado", "disconnected": "Desconectado", "you": "tú", "turn_of": "Turno de {player}", "slap_status": "¡Coincidencia! Pulsa tu mano", "special_status": "Carta especial", "winner_status": "🏆 Gana {player}", "special_card": "Especial: {card}", "special_text": "Pulsa, espera 2 segundos y vuelve a pulsar.", "first_click": "Primera pulsación", "wait": "Espera {seconds} s", "click_again": "Pulsa otra vez", "completed": "✅ COMPLETADO", "waiting_rest": "Esperando al resto", "thrown_by": "Tirada por {player}", "normal": "normal", "especial": "especial", "room_created": "Sala creada. Comparte el código con los demás jugadores.", "player_joined": "{player} se ha unido a la sala.", "game_started": "Partida iniciada. {deal} cartas por jugador. {box} a la caja.", "player_played": "{player} tira {emoji} {card}.", "special_started": "Especial: {emoji} {card}. Pulsa, espera 2 segundos y vuelve a pulsar.", "match_started": "Coincidencia de {emoji} {card}. Todos deben pulsar su mano.", "hand_received": "Mano recibida. Faltan jugadores.", "special_first_click": "Primera pulsación especial recibida. Espera 2 segundos.", "special_completed_waiting": "Especial completado. Faltan jugadores.", "take_center": "{player} se queda {count} carta{plural} del centro. {reason}", "winner": "{player} gana la partida.", "player_disconnected": "{player} se ha desconectado.", "reason_penalty_no_match": "Penalización: tocó la mano cuando no había coincidencia.", "reason_last_hand": "Último en poner la mano en coincidencia de {card}.", "reason_last_special": "Último en completar la carta especial {card}.", "err_invalid_players": "Número de jugadores inválido.", "err_room_not_found": "No existe una sala con ese código.", "err_game_started": "La partida ya ha empezado.", "err_room_full": "La sala ya está completa.", "err_only_host": "Solo el anfitrión puede empezar la partida.", "err_missing_players": "Faltan jugadores. Deben entrar {count}.", "err_wait_two_seconds": "Debes esperar los 2 segundos completos.", "card_taco": "Taco", "card_gato": "Gato", "card_cabra": "Cabra", "card_queso": "Queso", "card_pizza": "Pizza", "card_gorila": "Gorila", "card_marmota": "Marmota", "card_narval": "Narval", "players_2": "2 jugadores", "players_3": "3 jugadores", "players_4": "4 jugadores", "players_5": "5 jugadores", "players_6": "6 jugadores", "players_7": "7 jugadores", "players_8": "8 jugadores", "ui_name": "es"}, "en": {"title": "🌮 Taco · Cat · Goat · Cheese · Pizza", "subtitle": "Online multiplayer · iPhone · iPad · Android · computer", "sound_on": "🔊 Sound ON", "sound_off": "🔇 Sound OFF", "connect": "Connect", "your_name": "Your name", "players_game": "Players in the game", "create_room": "Create room", "room_code": "Room code", "join_room": "Join room", "room": "Room", "share_code": "Share this code with the other players. Everyone must open the same URL.", "start_game": "Start game", "players": "Players", "play_card": "Play card", "hand": "✋ HAND", "put_hand": "✋ PUT HAND", "hand_done": "✅ HAND PLACED", "empty_center": "Empty center", "center_count": "Center: {count} card{plural}", "box_count": "Box: {count} card{plural} out of play", "connected": "Connected", "disconnected": "Disconnected", "you": "you", "turn_of": "{player}'s turn", "slap_status": "Match! Tap your hand", "special_status": "Special card", "winner_status": "🏆 {player} wins", "special_card": "Special: {card}", "special_text": "Tap, wait 2 seconds, then tap again.", "first_click": "First tap", "wait": "Wait {seconds} s", "click_again": "Tap again", "completed": "✅ COMPLETED", "waiting_rest": "Waiting for the rest", "thrown_by": "Played by {player}", "normal": "normal", "especial": "special", "room_created": "Room created. Share the code with the other players.", "player_joined": "{player} joined the room.", "game_started": "Game started. {deal} cards per player. {box} in the box.", "player_played": "{player} plays {emoji} {card}.", "special_started": "Special: {emoji} {card}. Tap, wait 2 seconds, then tap again.", "match_started": "Match on {emoji} {card}. Everyone must tap their hand.", "hand_received": "Hand received. Waiting for players.", "special_first_click": "First special tap received. Wait 2 seconds.", "special_completed_waiting": "Special completed. Waiting for players.", "take_center": "{player} takes {count} card{plural} from the center. {reason}", "winner": "{player} wins the game.", "player_disconnected": "{player} disconnected.", "reason_penalty_no_match": "Penalty: hand was tapped when there was no match.", "reason_last_hand": "Last to put the hand on a {card} match.", "reason_last_special": "Last to complete the special card {card}.", "err_invalid_players": "Invalid number of players.", "err_room_not_found": "No room exists with that code.", "err_game_started": "The game has already started.", "err_room_full": "The room is already full.", "err_only_host": "Only the host can start the game.", "err_missing_players": "Missing players. {count} must join.", "err_wait_two_seconds": "You must wait the full 2 seconds.", "card_taco": "Taco", "card_gato": "Cat", "card_cabra": "Goat", "card_queso": "Cheese", "card_pizza": "Pizza", "card_gorila": "Gorilla", "card_marmota": "Groundhog", "card_narval": "Narwhal", "players_2": "2 players", "players_3": "3 players", "players_4": "4 players", "players_5": "5 players", "players_6": "6 players", "players_7": "7 players", "players_8": "8 players", "ui_name": "en"}, "fr": {"title": "🌮 Taco · Chat · Chèvre · Fromage · Pizza", "subtitle": "Multijoueur en ligne · iPhone · iPad · Android · ordinateur", "sound_on": "🔊 Son ON", "sound_off": "🔇 Son OFF", "connect": "Se connecter", "your_name": "Ton nom", "players_game": "Joueurs de la partie", "create_room": "Créer une salle", "room_code": "Code de salle", "join_room": "Rejoindre la salle", "room": "Salle", "share_code": "Partage ce code avec les autres joueurs. Tous doivent ouvrir la même URL.", "start_game": "Commencer la partie", "players": "Joueurs", "play_card": "Jouer une carte", "hand": "✋ MAIN", "put_hand": "✋ POSER LA MAIN", "hand_done": "✅ MAIN POSÉE", "empty_center": "Centre vide", "center_count": "Centre : {count} carte{plural}", "box_count": "Boîte : {count} carte{plural} hors jeu", "connected": "Connecté", "disconnected": "Déconnecté", "you": "toi", "turn_of": "Tour de {player}", "slap_status": "Correspondance ! Appuie sur ta main", "special_status": "Carte spéciale", "winner_status": "🏆 {player} gagne", "special_card": "Spéciale : {card}", "special_text": "Appuie, attends 2 secondes, puis appuie encore.", "first_click": "Première pression", "wait": "Attends {seconds} s", "click_again": "Appuie encore", "completed": "✅ TERMINÉ", "waiting_rest": "En attente des autres", "thrown_by": "Jouée par {player}", "normal": "normale", "especial": "spéciale", "room_created": "Salle créée. Partage le code avec les autres joueurs.", "player_joined": "{player} a rejoint la salle.", "game_started": "Partie commencée. {deal} cartes par joueur. {box} dans la boîte.", "player_played": "{player} joue {emoji} {card}.", "special_started": "Spéciale : {emoji} {card}. Appuie, attends 2 secondes, puis appuie encore.", "match_started": "Correspondance sur {emoji} {card}. Tout le monde doit appuyer sur sa main.", "hand_received": "Main reçue. Il manque des joueurs.", "special_first_click": "Première pression spéciale reçue. Attends 2 secondes.", "special_completed_waiting": "Spéciale terminée. Il manque des joueurs.", "take_center": "{player} prend {count} carte{plural} du centre. {reason}", "winner": "{player} gagne la partie.", "player_disconnected": "{player} s’est déconnecté.", "reason_penalty_no_match": "Pénalité : la main a été appuyée sans correspondance.", "reason_last_hand": "Dernier à poser la main sur une correspondance {card}.", "reason_last_special": "Dernier à terminer la carte spéciale {card}.", "err_invalid_players": "Nombre de joueurs invalide.", "err_room_not_found": "Aucune salle avec ce code.", "err_game_started": "La partie a déjà commencé.", "err_room_full": "La salle est déjà pleine.", "err_only_host": "Seul l’hôte peut commencer la partie.", "err_missing_players": "Il manque des joueurs. {count} doivent entrer.", "err_wait_two_seconds": "Tu dois attendre les 2 secondes complètes.", "card_taco": "Taco", "card_gato": "Chat", "card_cabra": "Chèvre", "card_queso": "Fromage", "card_pizza": "Pizza", "card_gorila": "Gorille", "card_marmota": "Marmotte", "card_narval": "Narval", "players_2": "2 joueurs", "players_3": "3 joueurs", "players_4": "4 joueurs", "players_5": "5 joueurs", "players_6": "6 joueurs", "players_7": "7 joueurs", "players_8": "8 joueurs", "ui_name": "fr"}, "de": {"title": "🌮 Taco · Katze · Ziege · Käse · Pizza", "subtitle": "Online-Mehrspieler · iPhone · iPad · Android · Computer", "sound_on": "🔊 Ton AN", "sound_off": "🔇 Ton AUS", "connect": "Verbinden", "your_name": "Dein Name", "players_game": "Spieler der Partie", "create_room": "Raum erstellen", "room_code": "Raumcode", "join_room": "Raum beitreten", "room": "Raum", "share_code": "Teile diesen Code mit den anderen Spielern. Alle müssen dieselbe URL öffnen.", "start_game": "Spiel starten", "players": "Spieler", "play_card": "Karte spielen", "hand": "✋ HAND", "put_hand": "✋ HAND DRAUF", "hand_done": "✅ HAND GESETZT", "empty_center": "Mitte leer", "center_count": "Mitte: {count} Karte{plural}", "box_count": "Schachtel: {count} Karte{plural} aus dem Spiel", "connected": "Verbunden", "disconnected": "Getrennt", "you": "du", "turn_of": "{player} ist am Zug", "slap_status": "Treffer! Tippe deine Hand", "special_status": "Spezialkarte", "winner_status": "🏆 {player} gewinnt", "special_card": "Spezial: {card}", "special_text": "Tippen, 2 Sekunden warten, dann erneut tippen.", "first_click": "Erster Tipp", "wait": "Warte {seconds} s", "click_again": "Nochmals tippen", "completed": "✅ FERTIG", "waiting_rest": "Warten auf die anderen", "thrown_by": "Gespielt von {player}", "normal": "normal", "especial": "spezial", "room_created": "Raum erstellt. Teile den Code mit den anderen Spielern.", "player_joined": "{player} ist dem Raum beigetreten.", "game_started": "Spiel gestartet. {deal} Karten pro Spieler. {box} in der Schachtel.", "player_played": "{player} spielt {emoji} {card}.", "special_started": "Spezial: {emoji} {card}. Tippen, 2 Sekunden warten, dann erneut tippen.", "match_started": "Treffer bei {emoji} {card}. Alle müssen ihre Hand tippen.", "hand_received": "Hand erhalten. Es fehlen Spieler.", "special_first_click": "Erster Spezialtipp erhalten. Warte 2 Sekunden.", "special_completed_waiting": "Spezial abgeschlossen. Es fehlen Spieler.", "take_center": "{player} nimmt {count} Karte{plural} aus der Mitte. {reason}", "winner": "{player} gewinnt das Spiel.", "player_disconnected": "{player} hat die Verbindung getrennt.", "reason_penalty_no_match": "Strafe: Hand gedrückt, obwohl es keinen Treffer gab.", "reason_last_hand": "Letzter bei der Handreaktion auf {card}.", "reason_last_special": "Letzter beim Abschließen der Spezialkarte {card}.", "err_invalid_players": "Ungültige Spielerzahl.", "err_room_not_found": "Es gibt keinen Raum mit diesem Code.", "err_game_started": "Das Spiel hat bereits begonnen.", "err_room_full": "Der Raum ist bereits voll.", "err_only_host": "Nur der Gastgeber kann das Spiel starten.", "err_missing_players": "Es fehlen Spieler. {count} müssen beitreten.", "err_wait_two_seconds": "Du musst die vollen 2 Sekunden warten.", "card_taco": "Taco", "card_gato": "Katze", "card_cabra": "Ziege", "card_queso": "Käse", "card_pizza": "Pizza", "card_gorila": "Gorilla", "card_marmota": "Murmeltier", "card_narval": "Narwal", "players_2": "2 spieler", "players_3": "3 spieler", "players_4": "4 spieler", "players_5": "5 spieler", "players_6": "6 spieler", "players_7": "7 spieler", "players_8": "8 spieler", "ui_name": "de"}, "ru": {"title": "🌮 Тако · Кот · Коза · Сыр · Пицца", "subtitle": "Онлайн-игра · iPhone · iPad · Android · компьютер", "sound_on": "🔊 Звук ВКЛ", "sound_off": "🔇 Звук ВЫКЛ", "connect": "Подключиться", "your_name": "Ваше имя", "players_game": "Игроки в партии", "create_room": "Создать комнату", "room_code": "Код комнаты", "join_room": "Войти в комнату", "room": "Комната", "share_code": "Поделитесь этим кодом с другими игроками. Все должны открыть тот же URL.", "start_game": "Начать игру", "players": "Игроки", "play_card": "Сыграть карту", "hand": "✋ РУКА", "put_hand": "✋ ПОЛОЖИТЬ РУКУ", "hand_done": "✅ РУКА ПОЛОЖЕНА", "empty_center": "Центр пуст", "center_count": "В центре: {count} карт.", "box_count": "В коробке: {count} карт вне игры", "connected": "Подключен", "disconnected": "Отключен", "you": "вы", "turn_of": "Ход игрока {player}", "slap_status": "Совпадение! Нажмите руку", "special_status": "Специальная карта", "winner_status": "🏆 Побеждает {player}", "special_card": "Спецкарта: {card}", "special_text": "Нажмите, подождите 2 секунды и нажмите снова.", "first_click": "Первое нажатие", "wait": "Ждите {seconds} с", "click_again": "Нажмите снова", "completed": "✅ ГОТОВО", "waiting_rest": "Ждем остальных", "thrown_by": "Сыграл {player}", "normal": "обычная", "especial": "специальная", "room_created": "Комната создана. Поделитесь кодом с другими игроками.", "player_joined": "{player} вошел в комнату.", "game_started": "Игра началась. {deal} карт на игрока. {box} в коробке.", "player_played": "{player} играет {emoji} {card}.", "special_started": "Спецкарта: {emoji} {card}. Нажмите, подождите 2 секунды и нажмите снова.", "match_started": "Совпадение {emoji} {card}. Все должны нажать свою руку.", "hand_received": "Рука принята. Ждем игроков.", "special_first_click": "Первое специальное нажатие принято. Ждите 2 секунды.", "special_completed_waiting": "Спецкарта выполнена. Ждем игроков.", "take_center": "{player} забирает {count} карт из центра. {reason}", "winner": "{player} выигрывает игру.", "player_disconnected": "{player} отключился.", "reason_penalty_no_match": "Штраф: рука нажата без совпадения.", "reason_last_hand": "Последний положил руку при совпадении {card}.", "reason_last_special": "Последний выполнил спецкарту {card}.", "err_invalid_players": "Неверное число игроков.", "err_room_not_found": "Комнаты с таким кодом нет.", "err_game_started": "Игра уже началась.", "err_room_full": "Комната уже заполнена.", "err_only_host": "Только ведущий может начать игру.", "err_missing_players": "Не хватает игроков. Нужно {count}.", "err_wait_two_seconds": "Нужно подождать полные 2 секунды.", "card_taco": "Тако", "card_gato": "Кот", "card_cabra": "Коза", "card_queso": "Сыр", "card_pizza": "Пицца", "card_gorila": "Горилла", "card_marmota": "Сурок", "card_narval": "Нарвал", "players_2": "2 игроки", "players_3": "3 игроки", "players_4": "4 игроки", "players_5": "5 игроки", "players_6": "6 игроки", "players_7": "7 игроки", "players_8": "8 игроки", "ui_name": "ru"}, "uk": {"title": "🌮 Тако · Кіт · Коза · Сир · Піца", "subtitle": "Онлайн-гра · iPhone · iPad · Android · комп’ютер", "sound_on": "🔊 Звук УВІМК", "sound_off": "🔇 Звук ВИМК", "connect": "Підключитися", "your_name": "Ваше ім’я", "players_game": "Гравці у грі", "create_room": "Створити кімнату", "room_code": "Код кімнати", "join_room": "Увійти в кімнату", "room": "Кімната", "share_code": "Поділіться цим кодом з іншими гравцями. Усі мають відкрити ту саму URL-адресу.", "start_game": "Почати гру", "players": "Гравці", "play_card": "Зіграти карту", "hand": "✋ РУКА", "put_hand": "✋ ПОКЛАСТИ РУКУ", "hand_done": "✅ РУКУ ПОКЛАДЕНО", "empty_center": "Центр порожній", "center_count": "У центрі: {count} карт.", "box_count": "У коробці: {count} карт поза грою", "connected": "Підключено", "disconnected": "Відключено", "you": "ви", "turn_of": "Хід гравця {player}", "slap_status": "Збіг! Натисніть руку", "special_status": "Спеціальна карта", "winner_status": "🏆 Перемагає {player}", "special_card": "Спецкарта: {card}", "special_text": "Натисніть, зачекайте 2 секунди і натисніть знову.", "first_click": "Перше натискання", "wait": "Зачекайте {seconds} с", "click_again": "Натисніть знову", "completed": "✅ ГОТОВО", "waiting_rest": "Чекаємо інших", "thrown_by": "Зіграв {player}", "normal": "звичайна", "especial": "спеціальна", "room_created": "Кімнату створено. Поділіться кодом з іншими гравцями.", "player_joined": "{player} приєднався до кімнати.", "game_started": "Гру розпочато. {deal} карт на гравця. {box} у коробці.", "player_played": "{player} грає {emoji} {card}.", "special_started": "Спецкарта: {emoji} {card}. Натисніть, зачекайте 2 секунди і натисніть знову.", "match_started": "Збіг {emoji} {card}. Усі мають натиснути свою руку.", "hand_received": "Руку отримано. Чекаємо гравців.", "special_first_click": "Перше спеціальне натискання отримано. Зачекайте 2 секунди.", "special_completed_waiting": "Спецкарту завершено. Чекаємо гравців.", "take_center": "{player} забирає {count} карт із центру. {reason}", "winner": "{player} виграє гру.", "player_disconnected": "{player} відключився.", "reason_penalty_no_match": "Штраф: руку натиснуто без збігу.", "reason_last_hand": "Останній поклав руку при збігу {card}.", "reason_last_special": "Останній завершив спецкарту {card}.", "err_invalid_players": "Неправильна кількість гравців.", "err_room_not_found": "Кімнати з таким кодом немає.", "err_game_started": "Гра вже почалася.", "err_room_full": "Кімната вже заповнена.", "err_only_host": "Лише ведучий може почати гру.", "err_missing_players": "Не вистачає гравців. Має увійти {count}.", "err_wait_two_seconds": "Потрібно зачекати повні 2 секунди.", "card_taco": "Тако", "card_gato": "Кіт", "card_cabra": "Коза", "card_queso": "Сир", "card_pizza": "Піца", "card_gorila": "Горила", "card_marmota": "Бабак", "card_narval": "Нарвал", "players_2": "2 гравці", "players_3": "3 гравці", "players_4": "4 гравці", "players_5": "5 гравці", "players_6": "6 гравці", "players_7": "7 гравці", "players_8": "8 гравці", "ui_name": "uk"}, "hi": {"title": "🌮 टाको · बिल्ली · बकरी · चीज़ · पिज़्ज़ा", "subtitle": "ऑनलाइन मल्टीप्लेयर · iPhone · iPad · Android · कंप्यूटर", "sound_on": "🔊 ध्वनि चालू", "sound_off": "🔇 ध्वनि बंद", "connect": "कनेक्ट करें", "your_name": "आपका नाम", "players_game": "खेल के खिलाड़ी", "create_room": "रूम बनाएं", "room_code": "रूम कोड", "join_room": "रूम में जाएं", "room": "रूम", "share_code": "यह कोड बाकी खिलाड़ियों से साझा करें। सभी को वही URL खोलना होगा।", "start_game": "खेल शुरू करें", "players": "खिलाड़ी", "play_card": "कार्ड खेलें", "hand": "✋ हाथ", "put_hand": "✋ हाथ रखें", "hand_done": "✅ हाथ रखा गया", "empty_center": "बीच खाली है", "center_count": "बीच में: {count} कार्ड", "box_count": "बॉक्स: {count} कार्ड खेल से बाहर", "connected": "कनेक्टेड", "disconnected": "डिस्कनेक्टेड", "you": "आप", "turn_of": "{player} की बारी", "slap_status": "मिलान! अपना हाथ दबाएं", "special_status": "विशेष कार्ड", "winner_status": "🏆 {player} जीता", "special_card": "विशेष: {card}", "special_text": "दबाएं, 2 सेकंड प्रतीक्षा करें, फिर दोबारा दबाएं।", "first_click": "पहला दबाव", "wait": "{seconds} सेकंड प्रतीक्षा करें", "click_again": "दोबारा दबाएं", "completed": "✅ पूरा", "waiting_rest": "बाकियों की प्रतीक्षा", "thrown_by": "खेला: {player}", "normal": "सामान्य", "especial": "विशेष", "room_created": "रूम बन गया। कोड बाकी खिलाड़ियों से साझा करें।", "player_joined": "{player} रूम में आ गया।", "game_started": "खेल शुरू। हर खिलाड़ी को {deal} कार्ड। बॉक्स में {box}।", "player_played": "{player} ने {emoji} {card} खेला।", "special_started": "विशेष: {emoji} {card}। दबाएं, 2 सेकंड प्रतीक्षा करें, फिर दोबारा दबाएं।", "match_started": "मिलान: {emoji} {card}। सभी अपना हाथ दबाएं।", "hand_received": "हाथ मिल गया। बाकी खिलाड़ियों की प्रतीक्षा।", "special_first_click": "पहला विशेष दबाव मिला। 2 सेकंड प्रतीक्षा करें।", "special_completed_waiting": "विशेष पूरा। बाकी खिलाड़ियों की प्रतीक्षा।", "take_center": "{player} बीच से {count} कार्ड लेता है। {reason}", "winner": "{player} खेल जीत गया।", "player_disconnected": "{player} डिस्कनेक्ट हो गया।", "reason_penalty_no_match": "दंड: मिलान न होने पर हाथ दबाया गया।", "reason_last_hand": "{card} मिलान पर हाथ रखने वाला अंतिम खिलाड़ी।", "reason_last_special": "विशेष कार्ड {card} पूरा करने वाला अंतिम खिलाड़ी।", "err_invalid_players": "खिलाड़ियों की संख्या गलत है।", "err_room_not_found": "इस कोड वाला रूम नहीं है।", "err_game_started": "खेल पहले ही शुरू हो चुका है।", "err_room_full": "रूम पहले से भरा है।", "err_only_host": "सिर्फ होस्ट खेल शुरू कर सकता है।", "err_missing_players": "खिलाड़ी कम हैं। {count} खिलाड़ियों को आना होगा।", "err_wait_two_seconds": "पूरे 2 सेकंड प्रतीक्षा करें।", "card_taco": "टाको", "card_gato": "बिल्ली", "card_cabra": "बकरी", "card_queso": "चीज़", "card_pizza": "पिज़्ज़ा", "card_gorila": "गोरिल्ला", "card_marmota": "मार्मोट", "card_narval": "नारव्हेल", "players_2": "2 खिलाड़ी", "players_3": "3 खिलाड़ी", "players_4": "4 खिलाड़ी", "players_5": "5 खिलाड़ी", "players_6": "6 खिलाड़ी", "players_7": "7 खिलाड़ी", "players_8": "8 खिलाड़ी", "ui_name": "hi"}, "zh": {"title": "🌮 塔可 · 猫 · 山羊 · 奶酪 · 披萨", "subtitle": "在线多人游戏 · iPhone · iPad · Android · 电脑", "sound_on": "🔊 声音开", "sound_off": "🔇 声音关", "connect": "连接", "your_name": "你的名字", "players_game": "本局玩家", "create_room": "创建房间", "room_code": "房间代码", "join_room": "加入房间", "room": "房间", "share_code": "把这个代码分享给其他玩家。所有人都要打开同一个网址。", "start_game": "开始游戏", "players": "玩家", "play_card": "出牌", "hand": "✋ 手", "put_hand": "✋ 放手", "hand_done": "✅ 已放手", "empty_center": "中间为空", "center_count": "中间：{count} 张牌", "box_count": "盒子：{count} 张牌不参与游戏", "connected": "已连接", "disconnected": "已断开", "you": "你", "turn_of": "{player} 的回合", "slap_status": "匹配！点击你的手", "special_status": "特殊牌", "winner_status": "🏆 {player} 获胜", "special_card": "特殊牌：{card}", "special_text": "点击，等待 2 秒，然后再次点击。", "first_click": "第一次点击", "wait": "等待 {seconds} 秒", "click_again": "再点击一次", "completed": "✅ 完成", "waiting_rest": "等待其他玩家", "thrown_by": "{player} 出的牌", "normal": "普通", "especial": "特殊", "room_created": "房间已创建。请把代码分享给其他玩家。", "player_joined": "{player} 加入了房间。", "game_started": "游戏开始。每位玩家 {deal} 张牌。盒子里 {box} 张。", "player_played": "{player} 出了 {emoji} {card}。", "special_started": "特殊牌：{emoji} {card}。点击，等待 2 秒，然后再次点击。", "match_started": "匹配：{emoji} {card}。所有人都要点击自己的手。", "hand_received": "已收到手势。等待其他玩家。", "special_first_click": "已收到第一次特殊点击。等待 2 秒。", "special_completed_waiting": "特殊牌已完成。等待其他玩家。", "take_center": "{player} 拿走中间的 {count} 张牌。{reason}", "winner": "{player} 赢得游戏。", "player_disconnected": "{player} 已断开连接。", "reason_penalty_no_match": "惩罚：没有匹配时点击了手。", "reason_last_hand": "{card} 匹配时最后放手。", "reason_last_special": "最后完成特殊牌 {card}。", "err_invalid_players": "玩家数量无效。", "err_room_not_found": "没有找到这个代码的房间。", "err_game_started": "游戏已经开始。", "err_room_full": "房间已满。", "err_only_host": "只有房主可以开始游戏。", "err_missing_players": "玩家还不够。需要 {count} 名玩家加入。", "err_wait_two_seconds": "你必须等待完整的 2 秒。", "card_taco": "塔可", "card_gato": "猫", "card_cabra": "山羊", "card_queso": "奶酪", "card_pizza": "披萨", "card_gorila": "大猩猩", "card_marmota": "土拨鼠", "card_narval": "独角鲸", "players_2": "2 玩家", "players_3": "3 玩家", "players_4": "4 玩家", "players_5": "5 玩家", "players_6": "6 玩家", "players_7": "7 玩家", "players_8": "8 玩家", "ui_name": "zh"}};
 const socket = io();
-let state = null;
-let myPlayerId = null;
-let roomCode = null;
-let soundEnabled = true;
-let audioCtx = null;
-let activeAnimalSound = null;
-let lastTap = {key:"",time:0};
-const logLines = [];
+let state=null,myPlayerId=null,roomCode=null,soundEnabled=true,audioCtx=null,activeAnimalSound=null,lastTap={key:"",time:0};
+let currentLang=localStorage.getItem("taco_lang")||"es";
+const logLines=[], $=id=>document.getElementById(id);
+document.documentElement.lang=currentLang; $("languageSelect").value=currentLang;
 
-const $ = id => document.getElementById(id);
+function t(key,vars={}){const d=I18N[currentLang]||I18N.es;let text=d[key]??I18N.es[key]??key;if(vars.cardKey) vars.card=t(vars.cardKey);if(vars.reasonKey) vars.reason=t(vars.reasonKey,vars);if(vars.count!==undefined&&vars.plural===undefined) vars.plural=Number(vars.count)===1?"":"s";return String(text).replace(/\{(\w+)\}/g,(_,k)=>vars[k]??"");}
+function messageText(m){if(!m)return"";if(typeof m==="string")return m;return t(m.key,m.params||{});}
+function cardName(c){return t(c.nameKey||("card_"+String(c.name||"").toLowerCase()));}
+function applyTranslations(){$("title").textContent=t("title");$("subtitle").textContent=t("subtitle");$("soundBtn").textContent=soundEnabled?t("sound_on"):t("sound_off");document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.getAttribute("data-i18n")));$("joinCode").placeholder=currentLang==="es"?"Ej. ABC23":"ABC23";}
 
-$("createBtn").addEventListener("pointerdown", e => safeTap("create", e, createRoom));
-$("joinBtn").addEventListener("pointerdown", e => safeTap("join", e, joinRoom));
-$("startBtn").addEventListener("pointerdown", e => safeTap("start", e, () => socket.emit("startGame")));
-$("playBtn").addEventListener("pointerdown", e => safeTap("play", e, () => socket.emit("playCard")));
-$("handBtn").addEventListener("pointerdown", e => safeTap("hand", e, () => socket.emit("hand")));
-$("specialBtn").addEventListener("pointerdown", e => safeTap("special", e, () => socket.emit("specialClick")));
-$("soundBtn").addEventListener("pointerdown", e => safeTap("sound", e, toggleSound));
-document.addEventListener("touchstart", () => initAudio(), {passive:true});
-document.addEventListener("pointerdown", () => initAudio(), {passive:true});
-
-socket.on("joined", data => { myPlayerId = data.playerId; roomCode = data.code; });
-socket.on("errorMessage", msg => alert(msg));
-socket.on("state", s => {
-  const oldPhase = state?.phase;
-  const oldLast = state?.lastPlayed?.card?.id;
-  state = s;
-  if(s.message) addLog(s.message);
-  if(s.lastPlayed && s.lastPlayed.card && s.lastPlayed.card.id !== oldLast) playCardSound(s.lastPlayed.card);
-  if(s.phase === "slap" && oldPhase !== "slap") playSlapSound();
-  render();
-});
-
-function safeTap(key, event, fn){
-  event && event.preventDefault();
-  event && event.stopPropagation();
-  initAudio();
-  const now = performance.now();
-  if(lastTap.key === key && now-lastTap.time < 350) return;
-  lastTap = {key,time:now};
-  fn();
-}
-
-function createRoom(){
-  socket.emit("createRoom", { name: $("name").value || "Jugador", maxPlayers: Number($("maxPlayers").value) });
-}
-function joinRoom(){
-  socket.emit("joinRoom", { name: $("name").value || "Jugador", code: $("joinCode").value });
-}
-
-function render(){
-  if(!state) return;
-  $("home").classList.add("hidden");
-  $("roomCode").textContent = state.code;
-
-  if(!state.started){
-    $("lobby").classList.remove("hidden");
-    $("game").classList.add("hidden");
-    $("startBtn").disabled = state.hostId !== myPlayerId || state.players.length !== state.maxPlayers;
-    $("lobbyPlayers").innerHTML = state.players.map(p => `<span class="badge">${p.connected ? "🟢":"⚪"} ${esc(p.name)} · ${p.count} cartas</span>`).join("");
-    return;
-  }
-
-  $("lobby").classList.add("hidden");
-  $("game").classList.remove("hidden");
-
-  const me = state.players.find(p => p.id === myPlayerId);
-  const turnName = state.players.find(p => p.id === state.currentPlayerId)?.name || "";
-  $("status").textContent = state.phase === "finished"
-    ? `🏆 Gana ${state.players.find(p => p.id === state.winnerId)?.name || ""}`
-    : state.phase === "normal"
-      ? `Turno de ${turnName}`
-      : state.phase === "slap"
-        ? "¡Coincidencia! Pulsa tu mano"
-        : "Carta especial";
-
-  $("players").innerHTML = state.players.map(p => `
-    <div class="player ${p.id===myPlayerId?"me":""} ${p.id===state.currentPlayerId?"turn":""} ${!p.connected?"off":""}">
-      <h3><span>${esc(p.name)} ${p.id===myPlayerId?"(tú)":""}</span><span>${p.count}</span></h3>
-      <div class="small">${p.connected ? "Conectado" : "Desconectado"}</div>
-    </div>`).join("");
-
-  $("pileCount").textContent = `Centro: ${state.centerCount} carta${state.centerCount===1?"":"s"}`;
-  $("boxInfo").textContent = `Caja: ${state.boxCount} carta${state.boxCount===1?"":"s"} fuera de juego`;
-  $("lastCard").innerHTML = state.lastPlayed ? cardHTML(state.lastPlayed.card, state.lastPlayed.playerName) : `<span class="small">Centro vacío</span>`;
-
-  $("playBtn").disabled = !(state.phase === "normal" && state.currentPlayerId === myPlayerId && me && me.count > 0);
-  const slapEntry = state.slap?.entries?.find(e => e.playerId === myPlayerId);
-  const handDone = Boolean(slapEntry?.pressedAt);
-  $("handBtn").disabled = handDone || state.phase === "finished";
-  $("handBtn").textContent = state.phase === "slap"
-    ? (handDone ? "✅ MANO PUESTA" : "✋ PONER MANO")
-    : "✋ MANO";
-  $("handBtn").className = "hand big" + (state.phase === "slap" && !handDone ? " ready" : "") + (handDone ? " done" : "");
-
-  renderSpecial();
-  $("log").innerHTML = logLines.slice(-12).map(x => `<div>${esc(x)}</div>`).join("");
-}
-
-function renderSpecial(){
-  if(state.phase !== "reaction" || !state.reaction){
-    $("special").classList.remove("show");
-    stopAnimalSound();
-    return;
-  }
-  const entry = state.reaction.entries.find(e => e.playerId === myPlayerId);
-  const card = state.reaction.card;
-  $("special").classList.add("show");
-  $("specialIcon").textContent = card.emoji;
-  $("specialTitle").textContent = `Especial: ${card.name}`;
-  if(entry.stage === 0){
-    $("specialBtn").disabled = false;
-    $("specialBtn").textContent = `${card.emoji} PULSAR`;
-    $("specialTimer").textContent = "Primera pulsación";
-  }else if(entry.stage === 1){
-    const left = Math.max(0, entry.readyAt - Date.now());
-    if(left > 0){
-      $("specialBtn").disabled = true;
-      $("specialTimer").textContent = `Espera ${(left/1000).toFixed(1)} s`;
-      startAnimalSound(card.name, Math.min(left, 2000));
-      setTimeout(renderSpecial, 100);
-    }else{
-      $("specialBtn").disabled = false;
-      $("specialBtn").textContent = `${card.emoji} OTRA VEZ`;
-      $("specialTimer").textContent = "Pulsa otra vez";
-    }
-  }else{
-    $("specialBtn").disabled = true;
-    $("specialBtn").textContent = "✅ COMPLETADO";
-    $("specialTimer").textContent = "Esperando al resto";
-  }
-}
-
-function cardHTML(card, playerName){
-  return `<div class="card" style="--c:${card.color}">
-    <div class="card-name">${esc(card.name)}</div>
-    <div class="emoji">${card.emoji}</div>
-    <div class="card-type">${card.type}</div>
-  </div><div class="small">Tirada por ${esc(playerName||"")}</div>`;
-}
-function addLog(text){ if(!text) return; if(logLines[logLines.length-1] !== text) logLines.push(text); }
-
-function esc(str){return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s]));}
-
-function toggleSound(){
-  soundEnabled = !soundEnabled;
-  $("soundBtn").textContent = soundEnabled ? "🔊 Sonido ON" : "🔇 Sonido OFF";
-  if(!soundEnabled){ stopAnimalSound(); speechSynthesis?.cancel?.(); }
-  else initAudio();
-}
-function initAudio(){
-  if(!soundEnabled) return;
-  try{
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if(Ctx && !audioCtx) audioCtx = new Ctx();
-    if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
-  }catch(e){}
-}
-function playCardSound(card){
-  if(!soundEnabled) return;
-  initAudio();
-  if(card.type === "normal") speakName(card.name);
-  else startAnimalSound(card.name, 900);
-}
-function speakName(name){
-  if(!("speechSynthesis" in window)) return playBeep(500);
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(name);
-    u.lang = "es-ES"; u.rate = 1.02; u.pitch = 1.05;
-    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith("es"));
-    if(v) u.voice = v;
-    speechSynthesis.speak(u);
-  }catch(e){ playBeep(500); }
-}
-function playBeep(freq){
-  if(!audioCtx) return;
-  const now = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
-  o.type = "triangle"; o.frequency.setValueAtTime(freq, now);
-  g.gain.setValueAtTime(.001, now); g.gain.exponentialRampToValueAtTime(.22, now+.02); g.gain.exponentialRampToValueAtTime(.001, now+.18);
-  o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now+.2);
-}
-function playSlapSound(){ playBeep(180); }
-function startAnimalSound(name, durationMs=2000){
-  if(!soundEnabled) return;
-  initAudio(); if(!audioCtx) return; stopAnimalSound();
-  const end = audioCtx.currentTime + durationMs/1000, master = audioCtx.createGain();
-  master.gain.setValueAtTime(.001,audioCtx.currentTime); master.gain.exponentialRampToValueAtTime(.28,audioCtx.currentTime+.03); master.gain.exponentialRampToValueAtTime(.001,end); master.connect(audioCtx.destination);
-  const nodes=[master];
-  const o = audioCtx.createOscillator(); o.type = name==="Gorila" ? "sawtooth" : name==="Marmota" ? "sine" : "triangle";
-  o.frequency.setValueAtTime(name==="Gorila"?72:name==="Marmota"?720:390, audioCtx.currentTime);
-  o.frequency.linearRampToValueAtTime(name==="Gorila"?48:name==="Marmota"?980:180, end);
-  o.connect(master); o.start(); o.stop(end); nodes.push(o);
-  activeAnimalSound = {nodes}; setTimeout(stopAnimalSound, durationMs+60);
-}
-function stopAnimalSound(){
-  if(!activeAnimalSound) return;
-  activeAnimalSound.nodes.forEach(n => { try{n.stop?.()}catch(e){} try{n.disconnect?.()}catch(e){} });
-  activeAnimalSound = null;
-}
-if("speechSynthesis" in window && speechSynthesis.onvoiceschanged !== undefined){
-  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-}
+$("languageSelect").addEventListener("change",()=>{currentLang=$("languageSelect").value;localStorage.setItem("taco_lang",currentLang);document.documentElement.lang=currentLang;applyTranslations();render();});
+$("createBtn").addEventListener("pointerdown",e=>safeTap("create",e,createRoom));$("joinBtn").addEventListener("pointerdown",e=>safeTap("join",e,joinRoom));$("startBtn").addEventListener("pointerdown",e=>safeTap("start",e,()=>socket.emit("startGame")));$("playBtn").addEventListener("pointerdown",e=>safeTap("play",e,()=>socket.emit("playCard")));$("handBtn").addEventListener("pointerdown",e=>safeTap("hand",e,()=>socket.emit("hand")));$("specialBtn").addEventListener("pointerdown",e=>safeTap("special",e,()=>socket.emit("specialClick")));$("soundBtn").addEventListener("pointerdown",e=>safeTap("sound",e,toggleSound));
+document.addEventListener("touchstart",()=>initAudio(),{passive:true});document.addEventListener("pointerdown",()=>initAudio(),{passive:true});
+socket.on("joined",d=>{myPlayerId=d.playerId;roomCode=d.code;});socket.on("errorMessage",m=>alert(messageText(m)));socket.on("state",s=>{const oldPhase=state?.phase,oldLast=state?.lastPlayed?.card?.id;state=s;if(s.message)addLog(messageText(s.message));if(s.lastPlayed&&s.lastPlayed.card&&s.lastPlayed.card.id!==oldLast)playCardSound(s.lastPlayed.card);if(s.phase==="slap"&&oldPhase!=="slap")playSlapSound();render();});
+function safeTap(key,event,fn){event&&event.preventDefault();event&&event.stopPropagation();initAudio();const now=performance.now();if(lastTap.key===key&&now-lastTap.time<350)return;lastTap={key,time:now};fn();}
+function createRoom(){socket.emit("createRoom",{name:$("name").value||"Jugador",maxPlayers:Number($("maxPlayers").value)});}
+function joinRoom(){socket.emit("joinRoom",{name:$("name").value||"Jugador",code:$("joinCode").value});}
+function render(){applyTranslations();if(!state)return;$("home").classList.add("hidden");$("roomCode").textContent=state.code;if(!state.started){$("lobby").classList.remove("hidden");$("game").classList.add("hidden");$("startBtn").disabled=state.hostId!==myPlayerId||state.players.length!==state.maxPlayers;$("lobbyPlayers").innerHTML=state.players.map(p=>`<span class="badge">${p.connected?"🟢":"⚪"} ${esc(p.name)} · ${p.count}</span>`).join("");return;}$("lobby").classList.add("hidden");$("game").classList.remove("hidden");const me=state.players.find(p=>p.id===myPlayerId),turnName=state.players.find(p=>p.id===state.currentPlayerId)?.name||"";$("status").textContent=state.phase==="finished"?t("winner_status",{player:state.players.find(p=>p.id===state.winnerId)?.name||""}):state.phase==="normal"?t("turn_of",{player:turnName}):state.phase==="slap"?t("slap_status"):t("special_status");$("players").innerHTML=state.players.map(p=>`<div class="player ${p.id===myPlayerId?"me":""} ${p.id===state.currentPlayerId?"turn":""} ${!p.connected?"off":""}"><h3><span>${esc(p.name)} ${p.id===myPlayerId?"("+t("you")+")":""}</span><span>${p.count}</span></h3><div class="small">${p.connected?t("connected"):t("disconnected")}</div></div>`).join("");$("pileCount").textContent=t("center_count",{count:state.centerCount});$("boxInfo").textContent=t("box_count",{count:state.boxCount});$("lastCard").innerHTML=state.lastPlayed?cardHTML(state.lastPlayed.card,state.lastPlayed.playerName):`<span class="small">${t("empty_center")}</span>`;$("playBtn").disabled=!(state.phase==="normal"&&state.currentPlayerId===myPlayerId&&me&&me.count>0);const slapEntry=state.slap?.entries?.find(e=>e.playerId===myPlayerId),handDone=Boolean(slapEntry?.pressedAt);$("handBtn").disabled=handDone||state.phase==="finished";$("handBtn").textContent=state.phase==="slap"?(handDone?t("hand_done"):t("put_hand")):t("hand");$("handBtn").className="hand big"+(state.phase==="slap"&&!handDone?" ready":"")+(handDone?" done":"");renderSpecial();$("log").innerHTML=logLines.slice(-12).map(x=>`<div>${esc(x)}</div>`).join("");}
+function renderSpecial(){if(state.phase!=="reaction"||!state.reaction){$("special").classList.remove("show");stopAnimalSound();return;}const entry=state.reaction.entries.find(e=>e.playerId===myPlayerId),card=state.reaction.card;$("special").classList.add("show");$("specialIcon").textContent=card.emoji;$("specialTitle").textContent=t("special_card",{card:cardName(card)});if(entry.stage===0){$("specialBtn").disabled=false;$("specialBtn").textContent=`${card.emoji} ${t("first_click")}`;$("specialTimer").textContent=t("first_click");}else if(entry.stage===1){const left=Math.max(0,entry.readyAt-Date.now());if(left>0){$("specialBtn").disabled=true;$("specialTimer").textContent=t("wait",{seconds:(left/1000).toFixed(1)});startAnimalSound(card.name,Math.min(left,2000));setTimeout(renderSpecial,100);}else{$("specialBtn").disabled=false;$("specialBtn").textContent=`${card.emoji} ${t("click_again")}`;$("specialTimer").textContent=t("click_again");}}else{$("specialBtn").disabled=true;$("specialBtn").textContent=t("completed");$("specialTimer").textContent=t("waiting_rest");}}
+function cardHTML(card,playerName){return `<div class="card" style="--c:${card.color}"><div class="card-name">${esc(cardName(card))}</div><div class="emoji">${card.emoji}</div><div class="card-type">${card.type==="normal"?t("normal"):t("especial")}</div></div><div class="small">${t("thrown_by",{player:playerName||""})}</div>`;}
+function addLog(text){if(!text)return;if(logLines[logLines.length-1]!==text)logLines.push(text);}function esc(str){return String(str).replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s]));}
+function toggleSound(){soundEnabled=!soundEnabled;$("soundBtn").textContent=soundEnabled?t("sound_on"):t("sound_off");if(!soundEnabled){stopAnimalSound();speechSynthesis?.cancel?.();}else initAudio();}
+function initAudio(){if(!soundEnabled)return;try{const Ctx=window.AudioContext||window.webkitAudioContext;if(Ctx&&!audioCtx)audioCtx=new Ctx();if(audioCtx&&audioCtx.state==="suspended")audioCtx.resume();}catch(e){}}
+function playCardSound(card){if(!soundEnabled)return;initAudio();if(card.type==="normal")speakName(cardName(card));else startAnimalSound(card.name,900);}
+function speakName(name){if(!("speechSynthesis"in window))return playBeep(500);try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(name);const langMap={es:"es-ES",en:"en-US",fr:"fr-FR",de:"de-DE",ru:"ru-RU",uk:"uk-UA",hi:"hi-IN",zh:"zh-CN"};u.lang=langMap[currentLang]||"es-ES";u.rate=1.02;u.pitch=1.05;const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.toLowerCase().startsWith((langMap[currentLang]||"es").split("-")[0].toLowerCase()));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){playBeep(500);}}
+function playBeep(freq){if(!audioCtx)return;const now=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type="triangle";o.frequency.setValueAtTime(freq,now);g.gain.setValueAtTime(.001,now);g.gain.exponentialRampToValueAtTime(.22,now+.02);g.gain.exponentialRampToValueAtTime(.001,now+.18);o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+.2);}
+function playSlapSound(){playBeep(180);}function startAnimalSound(name,durationMs=2000){if(!soundEnabled)return;initAudio();if(!audioCtx)return;stopAnimalSound();const end=audioCtx.currentTime+durationMs/1000,master=audioCtx.createGain();master.gain.setValueAtTime(.001,audioCtx.currentTime);master.gain.exponentialRampToValueAtTime(.28,audioCtx.currentTime+.03);master.gain.exponentialRampToValueAtTime(.001,end);master.connect(audioCtx.destination);const nodes=[master],o=audioCtx.createOscillator();o.type=name==="Gorila"?"sawtooth":name==="Marmota"?"sine":"triangle";o.frequency.setValueAtTime(name==="Gorila"?72:name==="Marmota"?720:390,audioCtx.currentTime);o.frequency.linearRampToValueAtTime(name==="Gorila"?48:name==="Marmota"?980:180,end);o.connect(master);o.start();o.stop(end);nodes.push(o);activeAnimalSound={nodes};setTimeout(stopAnimalSound,durationMs+60);}
+function stopAnimalSound(){if(!activeAnimalSound)return;activeAnimalSound.nodes.forEach(n=>{try{n.stop?.()}catch(e){}try{n.disconnect?.()}catch(e){}});activeAnimalSound=null;}
+if("speechSynthesis"in window&&speechSynthesis.onvoiceschanged!==undefined){speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}
+applyTranslations();
 </script>
 </body>
 </html>
